@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Popular Events Section -->
+    <h2>Popular Events</h2>
+    <div class="row">
+        {% for event in popular_events %}
+        <div class="col-md-4">
+            <div class="card mb-4 event-card">
+                <!-- Event Image -->
+                {% if event.image %}
+                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                {% else %}
+                <div class="card-img-top no-image-placeholder d-flex justify-content-center align-items-center">
+                    <span class="text-muted">No Image Available</span>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text"><i class="fas fa-map-marker-alt"></i> {{ event.venue }} - {{ event.date|date:"F j, Y" }}</p>
+                    <a href="{% url 'event_detail' event.id %}" class="btn btn-primary w-100">View Event</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No popular events found.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Recommended Events Section -->
+    <h2>Recommended for You</h2>
+    <div class="row">
+        {% for event in recommended_events %}
+        <div class="col-md-4">
+            <div class="card mb-4 event-card">
+                <!-- Event Image -->
+                {% if event.image %}
+                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                {% else %}
+                <div class="card-img-top no-image-placeholder d-flex justify-content-center align-items-center">
+                    <span class="text-muted">No Image Available</span>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text"><i class="fas fa-map-marker-alt"></i> {{ event.venue }} - {{ event.date|date:"F j, Y" }}</p>
+                    <a href="{% url 'event_detail' event.id %}" class="btn btn-primary w-100">View Event</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No recommended events found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

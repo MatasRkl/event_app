@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2 class="mb-4">Your Dashboard</h2>
+        
+        <!-- Events Created by the User -->
+        <div class="mb-5">
+            <h3>Events You Created</h3>
+            {% if created_events %}
+                <ul class="list-group">
+                    {% for event in created_events %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ event.title }}</strong> - {{ event.date }} - {{ event.venue }}
+                            </div>
+                            <div>
+                                <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-primary">View</a>
+                                <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{% url 'delete_event' event.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">You haven't created any events yet.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Events Booked by the User -->
+        <div>
+            <h3>Events You Booked</h3>
+            {% if booked_events %}
+                <ul class="list-group">
+                    {% for event in booked_events %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ event.title }}</strong> - {{ event.date }} - {{ event.venue }}
+                            </div>
+                            <div>
+                                <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-primary">View</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">You haven't booked any events yet.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

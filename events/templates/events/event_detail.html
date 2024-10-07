@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }}{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>{{ event.title }}</h2>
+
+                <!-- Display Event Image or Placeholder -->
+                <div class="card mb-4">
+                    {% if event.image %}
+                        <img src="{{ event.image.url }}" class="card-img-top img-fluid" alt="{{ event.title }}">
+                    {% else %}
+                        <div class="no-image-placeholder d-flex align-items-center justify-content-center">
+                            <span>No Image Available</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <p><strong>Description:</strong> {{ event.description }}</p>
+                <p><strong>Organizer:</strong> {{ event.organizer }}</p>
+                <p><strong>Date:</strong> {{ event.date }}</p>
+                <p><strong>City:</strong> {{ event.city }}</p>
+                <p><strong>Venue:</strong> {{ event.venue }}</p>
+                <p><strong>Category:</strong> {{ event.category.name }}</p>
+                <p><strong>Ticket price:</strong> {{ event.ticket_price }}</p>
+
+                <!-- Save/Unsave Button -->
+                {% if user.is_authenticated %}
+                    {% if user_saved_event %}
+                        <form method="POST" action="{% url 'unsave_event' event.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning">Unsave Event</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="{% url 'save_event' event.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Save Event</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Map Integration with OpenStreetMap and Leaflet.js -->
+        <div id="map" style="height: 400px; width: 100%;" class="mt-4"></div>
+
+        <!-- Leaflet.js Styles and Scripts -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+        <script>
+            var map = L.map('map').setView([{{ event.latitude }}, {{ event.longitude }}], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.marker([{{ event.latitude }}, {{ event.longitude }}]).addTo(map)
+                .bindPopup('<b>{{ event.title }}</b><br>{{ event.venue }}').openPopup();
+        </script>
+
+        <!-- Average Rating -->
+        <div>
+            <h3>Average Rating: {{ avg_rating|floatformat:1 }} / 5</h3>
+        </div>
+
+        <!-- Book Ticket Button -->
+        {% if user_has_booked %}
+            <p class="text-success">You have already booked this event.</p>
+        {% else %}
+            <a href="{% url 'book_ticket' event.id %}" class="btn btn-primary">Book Ticket</a>
+        {% endif %}
+
+        <!-- Reviews Section -->
+        <div class="mt-4">
+            <h3>Reviews</h3>
+            <ul class="list-group">
+                {% for review in reviews %}
+                    <li class="list-group-item">
+                        <strong>{{ review.user.username }}</strong> - {{ review.rating }} Stars
+                        <p>{{ review.comment }}</p>
+                        <small>Reviewed on {{ review.created_at|date:"F j, Y" }}</small>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No reviews yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+<!-- Submit Review Form -->
+{% if user_has_booked %}
+    <div class="mt-4">
+        <h3>Leave a Review</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="rating">Rating:</label>
+                <div class="rating">
+                    <label>
+                        <input type="radio" name="rating" value="1"> 1★
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="2"> 2★
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="3"> 3★
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="4"> 4★
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="5"> 5★
+                    </label>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                {{ form.comment.label_tag }}
+                {{ form.comment }}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+    </div>
+{% else %}
+    <p class="text-muted">You must attend the event to leave a review.</p>
+{% endif %}
+
+{% endblock %}

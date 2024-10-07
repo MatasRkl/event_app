@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Event List{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mb-4">Events</h1>
+
+        <!-- Create Event Button (Visible only for logged-in users) -->
+        {% if user.is_authenticated %}
+            <div class="text-center mb-4">
+                <a href="{% url 'create_event' %}" class="btn btn-primary">Create Event</a>
+            </div>
+        {% endif %}
+
+        <!-- Search and Filter Form -->
+        <form method="GET" action="" class="mb-4">
+            <div class="row">
+                <!-- Text Search -->
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="q" placeholder="Search events..." value="{{ query|default_if_none:'' }}">
+                </div>
+
+                <!-- Category Filter -->
+                <div class="col-md-2">
+                    <select class="form-select" name="category">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Date Filter -->
+                <div class="col-md-2">
+                    <input type="date" class="form-control" name="date" value="{{ date_filter }}">
+                </div>
+
+                <!-- Location Filter -->
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="location" placeholder="Location" value="{{ location_filter|default_if_none:'' }}">
+                </div>
+
+                <!-- Price Range Filter -->
+                <div class="col-md-1">
+                    <input type="number" class="form-control" name="min_price" placeholder="Min Price" value="{{ min_price }}">
+                </div>
+                <div class="col-md-1">
+                    <input type="number" class="form-control" name="max_price" placeholder="Max Price" value="{{ max_price }}">
+                </div>
+
+                <div class="col-md-12 mt-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Event List -->
+        <ul class="list-group">
+            {% for event in events %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ event.title }}</strong> - {{ event.date|date:"F j, Y, g:i a" }}
+                    </div>
+                    <div>
+                        <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-info">View Details</a>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No events found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2>Create Event</h2>
+            
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <form method="POST" enctype="multipart/form-data" class="mt-4" id="event-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <!-- Button to Fetch Coordinates -->
+                <button type="button" class="btn btn-secondary w-100" id="fetch-coordinates-btn">Fetch Coordinates</button>
+
+                <button type="submit" class="btn btn-primary w-100 mt-3">Create Event</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fetch-coordinates-btn').addEventListener('click', function() {
+            const city = document.querySelector('[name="city"]').value;
+            const venue = document.querySelector('[name="venue"]').value;
+            const address = `${venue}, ${city}`;
+            
+            // Use Nominatim API to get the coordinates
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const latitude = data[0].lat;
+                        const longitude = data[0].lon;
+
+                        // Populate the latitude and longitude fields in the form
+                        document.querySelector('[name="latitude"]').value = latitude;
+                        document.querySelector('[name="longitude"]').value = longitude;
+                    } else {
+                        alert("Coordinates not found. Please check the city/venue.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching coordinates:', error);
+                    alert("An error occurred while fetching coordinates.");
+                });
+        });
+    </script>
+{% endblock %}

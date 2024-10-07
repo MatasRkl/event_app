@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center">Profile</h2>
+
+            <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+
+            <hr>
+
+            <a href="{% url 'update_email' %}" class="btn btn-primary w-100 mb-3">Update Email</a>
+
+            {% if messages %}
+                <div class="mt-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <!-- Events Created by the User (With Analytics) -->
+        <h3>Events You Created</h3>
+        {% if created_events %}
+            <ul class="list-group">
+                {% for event in created_events %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ event.title }}</strong> - {{ event.date|date:"F j, Y" }} - {{ event.venue }}
+                            <p>Bookings: {{ event.num_bookings }}</p>
+                        </div>
+                        <div>
+                            <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'delete_event' event.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            <a href="{% url 'event_analytics' event.id %}" class="btn btn-sm btn-info">Track Analytics</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have not created any events yet.</p>
+        {% endif %}
+
+        <!-- Events the User Has Booked -->
+        <h3>Your Booked Events</h3>
+        {% if booked_events %}
+            <ul class="list-group">
+                {% for event in booked_events %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ event.title }}</strong> - {{ event.date|date:"F j, Y" }} - {{ event.venue }}
+                        </div>
+                        <div>
+                            <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-primary">View Event</a>
+                            <a href="{% url 'cancel_booking' event.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel Booking</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You haven't booked any events yet.</p>
+        {% endif %}
+    </div>
+{% endblock %}

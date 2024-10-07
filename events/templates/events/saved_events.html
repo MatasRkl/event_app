@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Events{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2 class="mb-4">Saved Events</h2>
+
+        {% if saved_events %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for saved_event in saved_events %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if saved_event.event.image %}
+                                <img src="{{ saved_event.event.image.url }}" class="card-img-top" alt="{{ saved_event.event.title }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top" alt="{{ saved_event.event.title }}">
+                            {% endif %}
+
+                            <div class="card-body">
+                                <h5 class="card-title">{{ saved_event.event.title }}</h5>
+                                <p class="card-text"><strong>Date:</strong> {{ saved_event.event.date|date:"F j, Y, g:i a" }}</p>
+                                <p class="card-text"><strong>Venue:</strong> {{ saved_event.event.venue }}</p>
+                                <p class="card-text"><strong>Category:</strong> {{ saved_event.event.category.name }}</p>
+                                <p class="card-text"><strong>Ticket Price:</strong> ${{ saved_event.event.ticket_price }}</p>
+                            </div>
+
+                            <div class="card-footer text-center">
+                                <a href="{% url 'event_detail' saved_event.event.id %}" class="btn btn-info">View Details</a>
+                                <form method="POST" action="{% url 'unsave_event' saved_event.event.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning">Unsave</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">You haven't saved any events yet.</p>
+        {% endif %}
+    </div>
+{% endblock %}

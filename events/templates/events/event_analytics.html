@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Event Analytics{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2>{{ event.title }} - Analytics</h2>
+
+        <p><strong>Date:</strong> {{ event.date|date:"F j, Y" }}</p>
+        <p><strong>Venue:</strong> {{ event.venue }}</p>
+        <p><strong>Category:</strong> {{ event.category.name }}</p>
+
+        <h3>Bookings: {{ bookings.count }}</h3>
+
+        <!-- Attendee List -->
+        <h4>Attendees</h4>
+        <ul class="list-group">
+            {% for attendee in attendees %}
+                <li class="list-group-item">{{ attendee.username }} - {{ attendee.email }}</li>
+            {% empty %}
+                <li class="list-group-item">No attendees yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
